@@ -201,7 +201,20 @@ const Launcher = {
     hideApp: function() {
         const app = this.remoteApp();
         if (this.canMinimize()) {
-            app.minimizeThenHideIfInTray();
+            // app.minimizeThenHideIfInTray();
+            const { spawn } = this.req('child_process');
+            const ps = spawn('i3-msg', [`[class="KeeWeb"]`, 'move scratchpad']);
+            ps.stdout.on('data', (data) => {
+                logger.debug(`stdout: ${data}`);
+            });
+
+            ps.stderr.on('data', (data) => {
+                logger.error(`stderr: ${data}`);
+            });
+
+            ps.on('close', (code) => {
+                logger.info(`child process exited with code ${code}`);
+            });
         } else {
             app.hide();
         }
